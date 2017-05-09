@@ -1,27 +1,42 @@
 <template>
-    <div :class="['dropdown','btn-group',visible?'show':'',dropup?'dropup':'']">
+    <div :class="['dropdown','btn-group',{dropup, show: visible}]">
 
-        <b-button :class="[split?'':'dropdown-toggle']"
-                  @click="click"
-                  aria-haspopup="true"
-                  :aria-expanded="visible"
-                  :variant="variant"
-                  :size="size"
-                  :disabled="disabled">
-            <slot name="text">{{text}}</slot>
-        </b-button>
-
-        <b-button class="dropdown-toggle dropdown-toggle-split"
-                  v-if="split"
-                  @click="toggle"
+        <b-button :class="{'dropdown-toggle': !split, 'btn-link': link}"
+                  ref="button"
+                  :id="id ? (id + '__BV_button_') : null"
+                  :aria-haspopup="split ? null : 'true'"
+                  :aria-expanded="split ? null : (visible ? 'true' : 'false')"
                   :variant="variant"
                   :size="size"
                   :disabled="disabled"
+                  @click.stop.prevent="click"
         >
-            <span class="sr-only">Toggle Dropdown</span>
+            <slot name="text">{{text}}</slot>
         </b-button>
 
-        <div :class="['dropdown-menu',right?'dropdown-menu-right':'']">
+        <b-button :class="['dropdown-toggle','dropdown-toggle-split',{'btn-link': link}]"
+                  v-if="split"
+                  ref="toggle"
+                  :id="id ? (id + '__BV_toggle_') : null"
+                  :aria-haspopup="split ? 'true' : null"
+                  :aria-expanded="split ? (visible ? 'true' : 'false') : null"
+                  :variant="variant"
+                  :size="size"
+                  :disabled="disabled"
+                  @click.stop.prevent="toggle"
+        >
+            <span class="sr-only">{{toggleText}}</span>
+        </b-button>
+
+        <div :class="['dropdown-menu',{'dropdown-menu-right': right}]"
+             ref="menu"
+             role="menu"
+             :aria-labelledby="id ? (id + (split ? '__BV_toggle_' : '__BV_button_')) : null"
+             @keyup.esc="onEsc"
+             @keydown.tab="onTab"
+             @keydown.up="focusNext($event,true)"
+             @keydown.down="focusNext($event,false)"
+        >
             <slot></slot>
         </div>
 
@@ -30,28 +45,24 @@
 
 <script>
     import clickOut from '../mixins/clickout';
+    import dropdown from '../mixins/dropdown';
     import bButton from './button.vue';
 
     export default {
-        mixins: [
-            clickOut
-        ],
-        components: {
-            bButton
-        },
+        mixins: [clickOut, dropdown],
+        components: {bButton},
         data() {
             return {
                 visible: false
             };
         },
         props: {
-            split: {
-                type: Boolean,
-                default: false
+            id: {
+                type: String
             },
-            text: {
+            toggleText: {
                 type: String,
-                default: ''
+                default: 'Toggle Dropdown'
             },
             size: {
                 type: String,
@@ -61,47 +72,21 @@
                 type: String,
                 default: null
             },
-            dropup: {
+            link: {
                 type: Boolean,
                 default: false
-            },
-            disabled: {
-                type: Boolean,
-                default: false
-            },
-            right: {
-                type: Boolean,
-                default: false
-            }
-        },
-        created() {
-            this.$root.$on('shown::dropdown', el => {
-                if (el !== this) {
-                    this.visible = false;
-                }
-            });
-        },
-        watch: {
-            visible(state, old) {
-                if (state === old) {
-                    return; // Avoid duplicated emits
-                }
-
-                if (state) {
-                    this.$root.$emit('shown::dropdown', this);
-                } else {
-                    this.$root.$emit('hidden::dropdown', this);
-                }
             }
         },
         methods: {
-            toggle() {
-                this.visible = !this.visible;
-            },
             clickOutListener() {
                 this.visible = false;
             },
             click(e) {
+                if (this.disabled) {
+                    this.visible = false;
+                    return;
+                }
+
                 if (this.split) {
                     this.$emit('click', e);
                     this.$root.$emit('shown::dropdown', this);

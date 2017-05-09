@@ -3,54 +3,26 @@
 > Bootstrap is the world’s most popular framework for building responsive, mobile-first sites and applications. Inside you’ll find high quality HTML, CSS, and JavaScript to make starting any project easier than ever. Vue is a library that focuses heavily on the ViewModel—the two-way data bindings that tie what we see and interact with on the screen with the application's data mode. 
 This library helps you quickly integrate bootstrap 4 components with vue.js 2.
 
-## Quick start
+# Setup
+To get started use [Quick Start](/docs/setup) guide.
+ 
 
-<br>
+# Migrating a project already using Bootstrap
+If you've already been using Bootstrap 4, there are a couple adjustments you may need to make to your project:
+ 
+- remove the bootstrap.js file from your page scripts or build pipeline
+- if Bootstrap is the only thing relying on jQuery, you can safely remove it—bootstrap-vue **does not** depend on jQuery
+- don't forget to include the `bootstrap-vue.css` file!
 
-### NPM (Webpack, Rollup)
-If you are using module bundlers such as Webpack, Rollup, Laravel elixir, etc you may prefer directly include package
-into your project. To get started use yarn or npm to get latest version.
+# Browsers Support
 
-```sh
-# Using YARN
-yarn add bootstrap-vue
+**CSS**
 
-# Using NPM
-npm install --save bootstrap-vue
-```
+Bootstrap Vue is to be used with Bootstrap 4 CSS.
+Please see [Browsers and devices](https://v4-alpha.getbootstrap.com/getting-started/browsers-devices)
+for more information about currently supported browsers by bootstrap 4. 
 
-Then register components in your app entrypoint:
+**JS**
 
-```js
-import Vue from 'vue'
-
-// ES build is more efficient by reducing unneeded components with tree-shaking.
-// (Needs Webpack 2 or Rollup)
-import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.esm';
-
-// Use commonjs version if es build is not working
-import BootstrapVue from 'bootstrap-vue';
-
-// Import styles if style-loader is available
-// You have to manually add css files if lines below are not working
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-
-// Globally register components
-Vue.use(BootstrapVue);
-```
-
-<br>
-
-### CDN (Browser)
-
-```html
-<!-- Add this to <head> -->
-<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap@next/dist/css/bootstrap.min.css"/>
-<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
-
-<!-- Add this after vue.js -->
-<script src="//unpkg.com/tether@latest/dist/js/tether.min.js"></script>
-<script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
-```
-
+BootstrapVue is written in Vue! So this is up to your project and bundler that which browsers are supported.
+If you want support older IE, Android and IOS devices, you may want using [Babel Polyfill](https://babeljs.io/docs/usage/polyfill)

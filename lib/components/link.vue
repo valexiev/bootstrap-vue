@@ -1,44 +1,39 @@
 <template>
-    <a :is="componentType" :active-class="activeClass" :to="to" :href="hrefString" :exact="exact" @click="click">
+    <!-- When VueRouter is available -->
+    <a v-if="isRouterLink"
+       is="router-link"
+       :active-class="activeClass"
+       :exact-active-class="exactActiveClass"
+       :disabled="disabled"
+       :aria-disabled="disabled ? 'true' : 'false'"
+       :to="to"
+       :exact="exact"
+       :append="append"
+       :replace="replace"
+       :event="event"
+       :tag="tag"
+       :class="linkClassObject"
+       @click="linkClick"
+    >
+        <slot></slot>
+    </a>
+
+    <!-- Fallback mode -->
+    <a v-else
+       :disabled="disabled"
+       :aria-disabled="disabled ? 'true' : 'false'"
+       :href="_href"
+       :class="linkClassObject"
+       @click="linkClick"
+    >
         <slot></slot>
     </a>
 </template>
 
 <script>
+    import linkMixin from '../mixins/link';
+
     export default {
-        computed: {
-            componentType() {
-                return (this.$router && this.to) ? 'router-link' : 'a';
-            },
-            hrefString() {
-                if (this.to) {
-                    return this.to.path || this.to;
-                }
-                return this.href;
-            }
-        },
-        props: {
-            activeClass: {
-                type: String,
-                default: 'active'
-            },
-            to: {
-                type: [String, Object],
-                default: null
-            },
-            href: {
-                type: String
-            },
-            exact: {
-                type: Boolean,
-                default: false
-            }
-        },
-        methods: {
-            click(e) {
-                this.$emit('click', e);
-                this.$root.$emit('shown::dropdown', this);
-            }
-        }
+        mixins: [linkMixin]
     };
 </script>

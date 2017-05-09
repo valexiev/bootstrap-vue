@@ -1,6 +1,12 @@
 <template>
-    <transition name="collapse">
-        <div :class="classObject" v-show="show">
+    <transition
+            @enter="enter"
+            @after-enter="clearHeight"
+            @leave="leave"
+            @after-leave="clearHeight"
+            name="collapse"
+    >
+        <div :class="classObject" v-show="show" :aria-expanded="show ? 'true' : 'false'">
             <slot></slot>
         </div>
     </transition>
@@ -10,11 +16,10 @@
     .collapse-enter-active, .collapse-leave-active {
         transition: all .35s ease;
         overflow: hidden;
-        max-height: 100vh;
     }
 
     .collapse-enter, .collapse-leave-to {
-        max-height: 0;
+        /*height: 0;*/
     }
 </style>
 
@@ -50,9 +55,35 @@
         methods: {
             toggle() {
                 this.show = !this.show;
+                this.emitState();
+            },
+            enter(el) {
+                el.style.height = 'auto';
+                const realHeight = getComputedStyle(el).height;
+                el.style.height = '0px';
+
+                /* eslint-disable no-unused-expressions */
+                el.offsetHeight; // Force repaint
+
+                el.style.height = realHeight;
+            },
+            leave(el) {
+                el.style.height = 'auto';
+                const realHeight = getComputedStyle(el).height;
+                el.style.height = realHeight;
+
+                /* eslint-disable no-unused-expressions */
+                el.offsetHeight; // Force repaint
+
+                el.style.height = '0px';
+            },
+            clearHeight(el) {
+                el.style.height = null;
+            },
+            emitState() {
+                this.$root.$emit('collapse::toggle::state', this.id, this.state);
             }
         },
-
         created() {
             this.$root.$on('collapse::toggle', target => {
                 if (target !== this.id) {
@@ -60,6 +91,9 @@
                 }
                 this.toggle();
             });
+        },
+        mounted() {
+            this.emitState();
         }
     };
 

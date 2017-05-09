@@ -1,11 +1,20 @@
 <template>
-    <button :class="classObject" :is="componentType" :to="to" :href="href" @click="onclick">
+    <button :class="classObject"
+            :is="componentType"
+            :to="to"
+            :href="href"
+            @click="onclick"
+            :disabled="disabled"
+    >
         <slot></slot>
     </button>
 </template>
 
 <script>
+    import bLink from './link.vue';
+
     export default {
+        components: {bLink},
         computed: {
             classObject() {
                 return [
@@ -46,13 +55,9 @@
                 type: Boolean,
                 default: false
             },
-            role: {
-                type: String,
-                default: ''
-            },
             size: {
                 type: String,
-                default: 'md'
+                default: null
             },
             variant: {
                 type: String,
@@ -67,7 +72,12 @@
         },
         methods: {
             onclick(e) {
-                this.$emit('click', e);
+                if (this.disabled) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                } else {
+                    this.$emit('click', e);
+                }
             }
         }
     };

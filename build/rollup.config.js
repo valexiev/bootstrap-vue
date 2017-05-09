@@ -4,6 +4,8 @@ const vue = require('rollup-plugin-vue');
 const buble = require('rollup-plugin-buble');
 const resolve = require('rollup-plugin-node-resolve');
 const commonjs = require('rollup-plugin-commonjs');
+const uglify = require('rollup-plugin-uglify');
+const {minify} = require('uglify-js-harmony');
 const CleanCSS = require('clean-css');
 const {camelCase} = require('lodash');
 const {name, dependencies} = require('../package.json');
@@ -11,6 +13,11 @@ const {name, dependencies} = require('../package.json');
 const base = path.resolve(__dirname, '..');
 const lib = path.resolve(base, 'lib');
 const dist = path.resolve(base, 'dist');
+
+// Ensure dist directory exists
+if (!fs.existsSync(dist)) {
+    fs.mkdirSync(dist);
+}
 
 module.exports = {
     entry: path.resolve(lib, 'index.js'),
@@ -27,7 +34,8 @@ module.exports = {
         }),
         buble(),
         resolve({external: ['vue']}),
-        commonjs()
+        commonjs(),
+        uglify({}, minify)
     ],
     globals: {
         tether: 'Tether'

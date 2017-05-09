@@ -1,18 +1,27 @@
 <template>
-    <a :is="itemType" class="dropdown-item" :to="to" :href="hrefString"  @click="click">
+    <b-link class="dropdown-item"
+            :active="active"
+            :disabled="disabled"
+            :href="href"
+            :to="to"
+            :tag="tag"
+            :exact="exact"
+            :append="append"
+            :replace="replace"
+            :active-class="activeClass"
+            :exact-active-class="exactActiveClass"
+            :event="event"
+    >
         <slot></slot>
-    </a>
+    </b-link>
 </template>
 
 <script>
-    import Link from './link.vue';
+    import linkMixin from '../mixins/link';
+    import bLink from './link.vue';
 
     export default {
-        extends: Link,
-        computed: {
-            itemType() {
-                return (this.href || this.to) ? this.componentType : 'button';
-            }
-        }
+        components: {bLink},
+        mixins: [linkMixin]
     };
 </script>
